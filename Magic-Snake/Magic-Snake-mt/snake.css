@@ -1,0 +1,29 @@
+body {
+    font-family: Monospace;
+    background-color: #000;
+    margin: 0px;
+    overflow: hidden;
+}
+#info {
+    position: absolute;
+    color: #fff;
+    top: 0px;
+    width: 100%;
+    padding: 5px;
+    text-align:center;
+}
+a {
+    color: #fff;
+}
+.button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+} 
+
+
