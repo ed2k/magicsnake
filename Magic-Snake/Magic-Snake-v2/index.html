@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Magic Snake</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="snake.css"/>
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	</head>
+	<body onload="playername()">
+
+
+		<!--div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - ConvexGeometry</div-->
+        <script type="text/javascript" src="../../javascripts/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="../../javascripts/math.min.js"></script>
+        <script type="text/javascript" src="calculate.js"></script>
+		<script src="../../javascripts/three.js-master/build/three.js"></script>
+		<script src="../../javascripts/three.js-master/examples/js/controls/OrbitControls.js"></script>
+		<script src="../../javascripts/three.js-master/examples/js/controls/TrackballControls.js"></script>
+		<script src="../../javascripts/three.js-master/examples/js/QuickHull.js"></script>
+		<script src="../../javascripts/three.js-master/examples/js/geometries/ConvexGeometry.js"></script>
+		<script src="../../javascripts/three.js-master/examples/js/Detector.js"></script>
+		<script src="../../javascripts/three.js-master/examples/js/libs/stats.min.js"></script>
+		<button id="addblock" class="w3-button w3-xlarge w3-circle w3-green">+</button>
+		<button id="rotateblock" class="w3-button w3-xlarge w3-circle w3-blue">&#8635;</button>
+		<button id="removeblock" class="w3-button w3-xlarge w3-circle w3-red">&#8722;</button>
+		<button class="w3-button w3-xlarge w3-circle w3-yellow" onclick="window.location.href='../index.html'" style="float: right">&#8962;</button>
+		<div style="text-align: center">
+		<button id="nextlevel">To Next Level</button>
+		<p id="targets" style="color:yellow;font-size:100%;">Targets</p>
+		
+		</div>
+		
+		<p id="p1" style="color:yellow;font-size:100%;" align="center">Play Magic Snake inside this Sphere.</p>
+        <p id="ps" style=" color:white;font-size:100%;" align="center"> Current score : 0 / Life Remains : 10</p>
+
+    <script type="text/javascript" src="magicsnake-v2.js"></script>
+	</body>
+</html>
