@@ -1,3 +1,6 @@
+/* TODO, collision detection
+experiment at https://jsfiddle.net/ed2k/8r32ftmp/36/
+*/
 const RAD2 = Math.SQRT2;
 const PI   = Math.PI;
 
