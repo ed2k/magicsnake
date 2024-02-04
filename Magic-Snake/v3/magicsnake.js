@@ -2,13 +2,14 @@ if (WEBGL.isWebGLAvailable() === false) {
     document.body.appendChild(WEBGL.getWebGLErrorMessage());
 }
 
+// x1,4,5,6 sqaure x2,3,5,6 sqaure x1,2,3,4 rectangle
 var x1 = math.matrix([-0.5, -0.5, -0.5]);
 var x2 = math.matrix([0.5, 0.5, -0.5]);
 var x3 = math.matrix([0.5, 0.5, 0.5]);
 var x4 = math.matrix([-0.5, -0.5, 0.5]);
 var x5 = math.matrix([0.5, -0.5, 0.5]);
 var x6 = math.matrix([0.5, -0.5, -0.5]);
-var th = [];
+var thedesign = [];
 var thdog = [1, 1, 3, 0, 2, 2, 0, 0, 3, 1, 0, 1, 1, 0, 2, 2, 0, 0, 1, 1, 0, 1, 1, 0, 0, 2, 2, 0, 1, 1, 0, 1, 3, 0, 0, 2, 2, 0, 3, 1, 0, 3, 1, 3, 3, 1, 3, 3, 0, 2, 2, 0, 3, 3, 1, 3, 3, 3, 0, 2, 2, 0, 1, 1, 1, 3, 1, 3, 3, 1, 3, 0];
 var rotate = 0;
 var rotaterec = [];
@@ -17,20 +18,22 @@ var vin = [];
 var vout = [];
 var count = 0;
 var error = 0;
-var posting;
 
 var canvas;
 var scenes = [], renderer;
+
 init();
 animate();
+
 function init() {
     canvas = document.getElementById("c");
     drawpath(thdog, 'dog', 0, [0, math.pi / 2, math.pi], [0, 0, 0]);
-    drawpath(th, 'your design', 1, [0, 0, 0], [0, 0, 0]);
+    drawpath(thedesign, 'your design', 1, [0, 0, 0], [0, 0, 0]);
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
     renderer.setClearColor(0xffffff, 1);
     renderer.setPixelRatio(window.devicePixelRatio);
 }
+
 function updateSize() {
     var width = canvas.clientWidth;
     var height = canvas.clientHeight;
@@ -38,10 +41,12 @@ function updateSize() {
         renderer.setSize(width, height, false);
     }
 }
+
 function animate() {
     render();
     requestAnimationFrame(animate);
 }
+
 function render() {
     updateSize();
     canvas.style.transform = `translateY(${window.scrollY}px)`;
@@ -81,8 +86,7 @@ function render() {
     });
 }
 
-
-function drawpath(th, j, c, rot, shi) {
+function drawpath(thedesign, j, c, rot, shi) {
     var x1 = math.matrix([-0.5, -0.5, -0.5]);
     var x2 = math.matrix([0.5, 0.5, -0.5]);
     var x3 = math.matrix([0.5, 0.5, 0.5]);
@@ -284,10 +288,10 @@ function drawpath(th, j, c, rot, shi) {
         group.add(mesh);
     }
 
-    if (th.length > 0) {
-        for (var i = 0; i < th.length; i++) {
+    if (thedesign.length > 0) {
+        for (var i = 0; i < thedesign.length; i++) {
             var vertices = [];
-            var next = nextposition(x1, x2, x3, x4, x5, x6, th[i] * math.pi / 2);
+            var next = nextposition(x1, x2, x3, x4, x5, x6, thedesign[i] * math.pi / 2);
             x1 = next[0];
             x2 = next[1];
             x3 = next[2];
@@ -302,7 +306,6 @@ function drawpath(th, j, c, rot, shi) {
                 new THREE.Vector3(x5.subset(math.index(0)), x5.subset(math.index(1)), x5.subset(math.index(2))),
                 new THREE.Vector3(x6.subset(math.index(0)), x6.subset(math.index(1)), x6.subset(math.index(2)))
             );
-
 
             var count = i + 1;
             var meshMaterial = new THREE.MeshLambertMaterial({
@@ -436,75 +439,7 @@ function drawpath(th, j, c, rot, shi) {
                 mesh.renderOrder = 1;
                 group.add(mesh);
             }
-            /*
-            
-            if (count%2==0){
-            var meshMaterial = new THREE.MeshLambertMaterial( {
-                color: 0x0080ff,
-                opacity: 0.5,
-                transparent: false
-                } );
-            var meshGeometry = new THREE.Geometry();
-            meshGeometry.vertices.push(                
-            new THREE.Vector3( x1.subset(math.index(0)), x1.subset(math.index(1)), x1.subset(math.index(2)) ),
-            new THREE.Vector3( x2.subset(math.index(0)), x2.subset(math.index(1)), x2.subset(math.index(2)) ),
-            new THREE.Vector3( x6.subset(math.index(0)), x6.subset(math.index(1)), x6.subset(math.index(2)) )
-            );
-            meshGeometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
-            var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
-            //mesh.material.side = THREE.BackSide; // back faces
-            mesh.renderOrder = 1;
-            group.add( mesh );
-                        
-            var meshGeometry = new THREE.Geometry();
-            meshGeometry.vertices.push(                
-            new THREE.Vector3( x3.subset(math.index(0)), x3.subset(math.index(1)), x3.subset(math.index(2)) ),
-            new THREE.Vector3( x4.subset(math.index(0)), x4.subset(math.index(1)), x4.subset(math.index(2)) ),
-            new THREE.Vector3( x5.subset(math.index(0)), x5.subset(math.index(1)), x5.subset(math.index(2)) )
-            );
-            meshGeometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
-            var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
-            //mesh.material.side = THREE.BackSide; // back faces
-            mesh.renderOrder = 1;
-            group.add( mesh );
-            } else {
-            var meshMaterial = new THREE.MeshLambertMaterial( {
-                color: 0xff0000,
-                opacity: 0.5,
-                transparent: false
-                } );                  
-            var meshGeometry = new THREE.Geometry();
-            meshGeometry.vertices.push(                
-            new THREE.Vector3( x1.subset(math.index(0)), x1.subset(math.index(1)), x1.subset(math.index(2)) ),
-            new THREE.Vector3( x2.subset(math.index(0)), x2.subset(math.index(1)), x2.subset(math.index(2)) ),
-            new THREE.Vector3( x3.subset(math.index(0)), x3.subset(math.index(1)), x3.subset(math.index(2)) )
-            );
-            meshGeometry.faces.push( new THREE.Face3( 2, 1, 0 ) );
-            var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
-            //mesh.material.side = THREE.BackSide; // back faces
-            mesh.renderOrder = 1;
-            group.add( mesh );
-                        
-            var meshGeometry = new THREE.Geometry();
-            meshGeometry.vertices.push(                
-            new THREE.Vector3( x1.subset(math.index(0)), x1.subset(math.index(1)), x1.subset(math.index(2)) ),
-            new THREE.Vector3( x3.subset(math.index(0)), x3.subset(math.index(1)), x3.subset(math.index(2)) ),
-            new THREE.Vector3( x4.subset(math.index(0)), x4.subset(math.index(1)), x4.subset(math.index(2)) )
-            );
-            meshGeometry.faces.push( new THREE.Face3( 2, 1, 0 ) );
-            var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
-            //mesh.material.side = THREE.BackSide; // back faces
-            mesh.renderOrder = 1;
-            group.add( mesh );
-            }
-            
-            */
-
-
-            // convex hull
-
         }
-
     }
 
     var stats = new Stats();
@@ -512,45 +447,6 @@ function drawpath(th, j, c, rot, shi) {
     //window.addEventListener( 'resize', onWindowResize, false );
     scenes.push(scene);
 }
-
-
-/*
-
-$("#addblock").click(function(){
-    scenes.pop(0);
-    th.push(0);
-    drawpath(th,0);
-    var content = document.getElementById( "content" );
-    content.removeChild(content.childNodes[1]);
-    rotate=0;
-    rotaterec.push(0);
-});
-
-$("#rotateblock").click(function(){
-    scenes.pop(0);
-    rotaterec.pop(-1);
-    rotate=rotate+1;
-    rotate=rotate%4;
-    th.pop(-1);
-    th.push(rotate);
-    drawpath(th,0);
-    var content = document.getElementById( "content" );
-    content.removeChild(content.childNodes[1]);
-    rotaterec.push(rotate);
-});
-
-$("#removeblock").click(function(){
-    scenes.pop(0);
-    rotaterec.pop(-1);
-    rotate=rotaterec[rotaterec.length-1];
-    th.pop(-1);
-    drawpath(th,0);
-    var content = document.getElementById( "content" );
-    content.removeChild(content.childNodes[1]);
-});
-
-*/
-
 
 $("#addblock").click(function () {
     if (error > 0) {
@@ -652,21 +548,11 @@ $("#addblock").click(function () {
         }
 
         error = collision(math.divide(math.add(x1, x3), 2), math.subtract(x3, x5), math.subtract(x5, x4), vcenter, vin, vout);
-        /*
-        if (error==0){
-        document.getElementById("p1").innerHTML = "No Collision, good to go!";
-        document.getElementById("p1").style.color = "green";
-        //
-        score=score+1000;
-        } else {
-        document.getElementById("p1").innerHTML = "Warning!! Collision happens!!";
-        document.getElementById("p1").style.color = "red";
-        }
-        */
+
         vcenter.push(math.divide(math.add(x1, x3), 2));
         vin.push(math.subtract(x3, x5));
         vout.push(math.subtract(x5, x4));
-        th.push(0);
+        thedesign.push(0);
         rotate = 0;
     }
     //document.getElementById("ps").innerHTML = "Current score : "+ score.toString() + " / Life Remains : "+life.toString();
@@ -685,15 +571,15 @@ $("#removeblock").click(function () {
         vcenter.pop(-1);
         vin.pop(-1);
         vout.pop(-1);
-        th.pop(-1);
+        thedesign.pop(-1);
         x1 = math.matrix([-0.5, -0.5, -0.5]);
         x2 = math.matrix([0.5, 0.5, -0.5]);
         x3 = math.matrix([0.5, 0.5, 0.5]);
         x4 = math.matrix([-0.5, -0.5, 0.5]);
         x5 = math.matrix([0.5, -0.5, 0.5]);
         x6 = math.matrix([0.5, -0.5, -0.5]);
-        for (var i = 0; i < th.length; i++) {
-            var next = nextposition(x1, x2, x3, x4, x5, x6, th[i] * math.pi / 2);
+        for (var i = 0; i < thedesign.length; i++) {
+            var next = nextposition(x1, x2, x3, x4, x5, x6, thedesign[i] * math.pi / 2);
             x1 = next[0];
             x2 = next[1];
             x3 = next[2];
@@ -724,15 +610,15 @@ $("#rotateblock").click(function () {
         vcenter.pop(-1);
         vin.pop(-1);
         vout.pop(-1);
-        th.pop(-1);
+        thedesign.pop(-1);
         x1 = math.matrix([-0.5, -0.5, -0.5]);
         x2 = math.matrix([0.5, 0.5, -0.5]);
         x3 = math.matrix([0.5, 0.5, 0.5]);
         x4 = math.matrix([-0.5, -0.5, 0.5]);
         x5 = math.matrix([0.5, -0.5, 0.5]);
         x6 = math.matrix([0.5, -0.5, -0.5]);
-        for (var i = 0; i < th.length; i++) {
-            var next = nextposition(x1, x2, x3, x4, x5, x6, th[i] * math.pi / 2);
+        for (var i = 0; i < thedesign.length; i++) {
+            var next = nextposition(x1, x2, x3, x4, x5, x6, thedesign[i] * math.pi / 2);
             x1 = next[0];
             x2 = next[1];
             x3 = next[2];
@@ -761,19 +647,11 @@ $("#rotateblock").click(function () {
         );
 
         error = collision(math.divide(math.add(x1, x3), 2), math.subtract(x3, x5), math.subtract(x5, x4), vcenter, vin, vout);
-        /*
-        if (error==0){
-        document.getElementById("p1").innerHTML = "No Collision, good to go!";
-        document.getElementById("p1").style.color = "green";
-        } else {
-        document.getElementById("p1").innerHTML = "Warning!! Collision happens!!";
-        document.getElementById("p1").style.color = "red";
-        }
-        */
+
         vcenter.push(math.divide(math.add(x1, x3), 2));
         vin.push(math.subtract(x3, x5));
         vout.push(math.subtract(x5, x4));
-        th.push(rotate % 4);
+        thedesign.push(rotate % 4);
 
         // convex hull
         var meshMaterial = new THREE.MeshLambertMaterial({
