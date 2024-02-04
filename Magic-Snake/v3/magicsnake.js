@@ -2,7 +2,7 @@ if (WEBGL.isWebGLAvailable() === false) {
     document.body.appendChild(WEBGL.getWebGLErrorMessage());
 }
 
-// x1,4,5,6 sqaure x2,3,5,6 sqaure x1,2,3,4 rectangle
+// initial block position, points x1,4,5,6 sqaure x2,3,5,6 sqaure x1,2,3,4 rectangle
 var x1 = math.matrix([-0.5, -0.5, -0.5]);
 var x2 = math.matrix([0.5, 0.5, -0.5]);
 var x3 = math.matrix([0.5, 0.5, 0.5]);
