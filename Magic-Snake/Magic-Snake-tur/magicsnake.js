@@ -21,17 +21,29 @@ var count=0;
 var error=0;
 var posting;
 
-var canvas;
+var canvas, camera;
 var scenes = [], renderer;
 init();
 animate();
+
+// Update the camera when window resizes
+window.addEventListener('resize', function () {
+    //camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    console.log(window.innerWidth, window.innerHeight)
+    renderer.setSize( window.innerWidth, window.innerHeight - 5 );
+}, false );
+
 function init() {
-    canvas = document.getElementById( "c" );
+    //canvas = document.getElementById( "c" );
        // drawpath(thdog,'dog',0,[0,math.pi/2, math.pi],[0,0,-10]);
         //drawpath(th,'your design',1,[0,0,0],[0,0,0]);
-    renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
+    //renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
+    renderer = new THREE.WebGLRenderer();
     renderer.setClearColor( 0xffffff, 1 );
     renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight - 5 );
+    document.body.appendChild( renderer.domElement );
 }
 function updateSize() {
     var width = canvas.clientWidth;
@@ -45,8 +57,8 @@ function animate() {
     requestAnimationFrame( animate );
 }
 function render() {
-    updateSize();
-    canvas.style.transform = `translateY(${window.scrollY}px)`;
+    //updateSize();
+    //canvas.style.transform = `translateY(${window.scrollY}px)`;
     renderer.setClearColor( 0xffffff );
     renderer.setScissorTest( false );
     renderer.clear();
@@ -67,12 +79,13 @@ function render() {
         }
         // set the viewport
         var width  = rect.right - rect.left;
+        width = window.innerWidth;
         var height = rect.bottom - rect.top;
         var left   = rect.left;
         var top    = rect.top;
         renderer.setViewport( left, top, width, height );
         renderer.setScissor( left, top, width, height );
-        var camera = scene.userData.camera;
+        camera = scene.userData.camera;
         //camera.aspect = width / height; // not changing in this example
         //camera.updateProjectionMatrix();
         var controls = scene.userData.controls;
