@@ -103,9 +103,20 @@ let reds = buildBlocks(shape, redMaterial, RAD2 / 2);
 
 // Converts a string into a json object containing numbered angles
 function genAngles(s) {
+    let totalBlocks = configs.totalBlocks;
     let angles = {};
-    for(let i = 1; i < 24; i++) {
+    for(let i = 1; i < totalBlocks; i++) {
         angles["angle" + i] = parseInt(s[i-1]);
+    }
+    return angles;
+}
+
+// generate variable size default zero
+function genAnglesWithSize(size) {
+    let totalBlocks = configs.totalBlocks;
+    let angles = {};
+    for(let i = 1; i < totalBlocks; i++) {
+        angles["angle" + i] = 0;
     }
     return angles;
 }
@@ -119,6 +130,7 @@ function updateAllWorlds() {
     }
 }
 
+let configs = {totalBlocks: 24}
 // Initial position is a line (all angles are 0)
 // 0=>0 1=>PI/2 2=>PI 3=>-PI/2
 const n2a = {0:0, 1:PI/2, 2:PI, 3:-PI/2}
@@ -127,8 +139,9 @@ let prevAngles = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
 function redrawSnake() {
     let rotationPoint = new THREE.Vector3(3 * RAD2 / 4, RAD2 / 4, 0.5);
+    let totalBlocks = configs.totalBlocks;
 
-    for(let triCount = 1; triCount < 24; triCount++) {
+    for(let triCount = 1; triCount < totalBlocks; triCount++) {
         // Without this, the world matrices don't get updated and the rotations are messed up
         updateAllWorlds();
         // If particular angle didn't change, don't rotate
@@ -183,7 +196,7 @@ function getPresetJSON() {
         "closed": false,
         "remembered": {
             "Default": {
-                "0": genAngles("00000000000000000000000")
+                "0": genAnglesWithSize(configs.totalBlocks)
             },
             "Cat": {
                 "0": genAngles("02202201022022022000000")
@@ -224,6 +237,7 @@ function getPresetJSON() {
     f1.add(controls, "autoRotate");
     f1.add(window, "clickToAnimate");
     f1.add(window, "playSound");
+    f1.add(configs, "totalBlocks", 0, 72).step(1).onChange(redrawSnake).listen();
 
     function colorChange(material, newColor) {
         material.color.setRGB(newColor.r/256, newColor.g/256, newColor.b/256);
@@ -235,8 +249,9 @@ function getPresetJSON() {
     f1.addColor(colorHolder, "color2").onChange(colorChange.bind(null, redMaterial));
     f1.open();
 
+    let totalBlocks = configs.totalBlocks;
     let f2 = gui.addFolder("Angle Controls");
-    for(let i = 1; i < 24; i++) {
+    for(let i = 1; i < totalBlocks; i++) {
         f2.add(currentAngles, "angle" + i, 0, 3).step(1).onChange(redrawSnake).listen();
     }
 })();
@@ -251,7 +266,8 @@ function clickToAnimate() {
     let animateGoal = Object.assign({}, currentAngles);
 
     // Reset to a straight line
-    for(let i = 1; i < 24; i++) {
+    let totalBlocks = configs.totalBlocks;
+    for(let i = 1; i < totalBlocks; i++) {
         currentAngles["angle" + i] = 0;
     }
 
@@ -260,13 +276,14 @@ function clickToAnimate() {
 }
 
 function buildHelper(goal, count) {
-    while(currentAngles["angle" + count] == goal["angle" + count] && count <= 23) {
+    let totalBlocks = configs.totalBlocks;
+    while(currentAngles["angle" + count] == goal["angle" + count] && count < totalBlocks) {
         count++;
     }
     currentAngles["angle" + count] = goal["angle" + count];
 
     redrawSnake();
-    if(count < 23) {
+    if(count < (totalBlocks-1)) {
         setTimeout(buildHelper.bind(null, goal, count + 1), 500);
     } else {
         building = false;
