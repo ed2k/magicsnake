@@ -101,15 +101,11 @@ shape.lineTo( RAD2 / 2, 0);
 shape.lineTo( 0, RAD2 / 2 );
 let reds = buildBlocks(shape, redMaterial, RAD2 / 2);
 
-// Converts a string into a json object containing angles
+// Converts a string into a json object containing numbered angles
 function genAngles(s) {
     let angles = {};
     for(let i = 1; i < 24; i++) {
-        let angle = PI / 2 * parseInt(s[i-1]);
-        if(angle > PI) {
-            angle = angle - 2 * PI;
-        }
-        angles["angle" + i] = angle;
+        angles["angle" + i] = parseInt(s[i-1]);
     }
     return angles;
 }
@@ -124,6 +120,8 @@ function updateAllWorlds() {
 }
 
 // Initial position is a line (all angles are 0)
+// 0=>0 1=>PI/2 2=>PI 3=>-PI/2
+const n2a = {0:0, 1:PI/2, 2:PI, 3:-PI/2}
 let currentAngles = genAngles("00000000000000000000000");
 let prevAngles = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
@@ -159,7 +157,7 @@ function redrawSnake() {
         // TODO: consider the fundamental approach here.  Essentially we're always looking
         // at changes in the angles from prior values.  Maybe floating point rounding
         // errors could accumulate after a series of movements.
-        let rotationAngle = currentAngles["angle" + triCount] - prevAngles[triCount];
+        let rotationAngle = n2a[currentAngles["angle" + triCount]] - n2a[prevAngles[triCount]];
         let rotationMatrix = new THREE.Matrix4().makeRotationAxis(rotationVector, rotationAngle);
         prevAngles[triCount] = currentAngles["angle" + triCount];
 
@@ -239,7 +237,7 @@ function getPresetJSON() {
 
     let f2 = gui.addFolder("Angle Controls");
     for(let i = 1; i < 24; i++) {
-        f2.add(currentAngles, "angle" + i, -1 * PI, PI).step(PI/2).onChange(redrawSnake).listen();
+        f2.add(currentAngles, "angle" + i, 0, 3).step(1).onChange(redrawSnake).listen();
     }
 })();
 
