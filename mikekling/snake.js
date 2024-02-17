@@ -70,7 +70,7 @@ function buildBlocks(shape, material, offset) {
     scene.add(mesh);
     blocks.push(mesh);
 
-    for(let i = 1; i < 12; i++) {
+    for(let i = 1; i < configs.totalBlocks; i++) {
         let newMesh = mesh.clone();
         newMesh.position.set(RAD2 * i + offset, 0, 0);
         scene.add(newMesh);
@@ -79,6 +79,7 @@ function buildBlocks(shape, material, offset) {
     return blocks;
 }
 
+let configs = {totalBlocks: 24}
 // First, add the lower 'blue' set of triangular blocks
 let blueMaterial = new THREE.MeshPhongMaterial( { color: 0x156289,
     emissive: 0x072534, side: THREE.DoubleSide, flatShading: true } );
@@ -130,16 +131,36 @@ function updateAllWorlds() {
     }
 }
 
-let configs = {totalBlocks: 24}
 // Initial position is a line (all angles are 0)
 // 0=>0 1=>PI/2 2=>PI 3=>-PI/2
 const n2a = {0:0, 1:PI/2, 2:PI, 3:-PI/2}
-let currentAngles = genAngles("00000000000000000000000");
-let prevAngles = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+let currentAngles = genAngles('0'.repeat(configs.totalBlocks - 1));
+let prevAngles = Array(configs.totalBlocks).fill(0);
+function updateAngles() {
+    const delta = configs.totalBlocks - prevAngles.length;
+    if (delta === 0) return
+    angleBlocks = configs.totalBlocks - 1;
+    if (delta > 0) {
+        prevAngles = prevAngles.concat(Array(delta).fill(0));
+        for (let i = angleBlocks; i > (angleBlocks - delta); i-- ) {
+            currentAngles["angle" + i] = 0;
+        }
+    } else {
+        prevAngles = prevAngles.slice(0, configs.totalBlocks);
+        for (let i = angleBlocks; i > (angleBlocks - delta); i-- ) {
+            delete currentAngles["angle" + i];
+        }
+    }
+    blues = buildBlocks(shape, blueMaterial, 0);
+    reds = buildBlocks(shape, redMaterial, RAD2 / 2);
+    redrawSnake();
+    buildGUI();
+}
 
 function redrawSnake() {
     let rotationPoint = new THREE.Vector3(3 * RAD2 / 4, RAD2 / 4, 0.5);
     let totalBlocks = configs.totalBlocks;
+    console.log(totalBlocks);
 
     for(let triCount = 1; triCount < totalBlocks; triCount++) {
         // Without this, the world matrices don't get updated and the rotations are messed up
@@ -228,33 +249,39 @@ function getPresetJSON() {
 }
 
 // Build GUI controls
-(function buildGUI() {
-    let gui = new dat.GUI({load: getPresetJSON(), preset: 'Default'});
+let gui = new dat.GUI({load: getPresetJSON(), preset: 'Default'});
+let f1, f2 = null;
+function buildGUI() {
     gui.remember(currentAngles);
 
-    let f1 = gui.addFolder("Basic Controls");
+    if (!f1) {
+        f1 = gui.addFolder("Basic Controls");
 
-    f1.add(controls, "autoRotate");
-    f1.add(window, "clickToAnimate");
-    f1.add(window, "playSound");
-    f1.add(configs, "totalBlocks", 0, 72).step(1).onChange(redrawSnake).listen();
-
-    function colorChange(material, newColor) {
-        material.color.setRGB(newColor.r/256, newColor.g/256, newColor.b/256);
+        f1.add(controls, "autoRotate");
+        f1.add(window, "clickToAnimate");
+        f1.add(window, "playSound");
+        f1.add(configs, "totalBlocks", 2, 72).step(1).onChange(updateAngles).listen();
+        function colorChange(material, newColor) {
+            material.color.setRGB(newColor.r/256, newColor.g/256, newColor.b/256);
+        }
+    
+        let colorHolder = {"color1": {"r": 0x15, "g": 0x62, "b": 0x89},
+                           "color2": {"r": 0xFF, "g": 0x00, "b": 0x00}};
+        f1.addColor(colorHolder, "color1").onChange(colorChange.bind(null, blueMaterial));
+        f1.addColor(colorHolder, "color2").onChange(colorChange.bind(null, redMaterial));
+        f1.open();
     }
 
-    let colorHolder = {"color1": {"r": 0x15, "g": 0x62, "b": 0x89},
-                       "color2": {"r": 0xFF, "g": 0x00, "b": 0x00}};
-    f1.addColor(colorHolder, "color1").onChange(colorChange.bind(null, blueMaterial));
-    f1.addColor(colorHolder, "color2").onChange(colorChange.bind(null, redMaterial));
-    f1.open();
-
     let totalBlocks = configs.totalBlocks;
-    let f2 = gui.addFolder("Angle Controls");
+    if (f2) {
+        gui.removeFolder(f2);
+    }
+    f2 = gui.addFolder("Angle Controls");
     for(let i = 1; i < totalBlocks; i++) {
         f2.add(currentAngles, "angle" + i, 0, 3).step(1).onChange(redrawSnake).listen();
     }
-})();
+}
+buildGUI();
 
 // Animate building the current shape step by step from the starting position
 let building = false;
