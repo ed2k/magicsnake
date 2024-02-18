@@ -161,18 +161,21 @@ function updateAngles() {
         }
     } else {
         prevAngles = prevAngles.slice(0, configs.totalBlocks);
-        for (let i = angleBlocks; i > (angleBlocks - delta); i-=2 ) {
+        for (let i = angleBlocks - delta; i > angleBlocks; i-=2 ) {
             console.log(i);
             delete currentAngles["angle" + i];
             delete currentAngles["angle" + (i - 1)];
-            scene.remove(blues[i/2]);
-            blues.splice(i/2, 1);
-            scene.remove(reds[i/2]);
-            reds.splice(i/2, 1);
+
+            const idx = Math.floor(i/2);
+            let mesh = blues[idx];
+            scene.remove(mesh);
+            blues.splice(idx, 1);
+
+            scene.remove(reds[idx]);
+            reds.splice(idx, 1);
         }
     }
-    blues = buildBlocks(blueShape, blueMaterial, 0);
-    reds = buildBlocks(redShape, redMaterial, RAD2 / 2);
+
     redrawSnake();
     buildGUI();
 }
