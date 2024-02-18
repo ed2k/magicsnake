@@ -84,23 +84,23 @@ let configs = {totalBlocks: 24}
 let blueMaterial = new THREE.MeshPhongMaterial( { color: 0x156289,
     emissive: 0x072534, side: THREE.DoubleSide, flatShading: true } );
 
-let shape = new THREE.Shape();
-shape.moveTo( 0,0 );
-shape.lineTo( RAD2, 0);
-shape.lineTo( RAD2 / 2, RAD2 / 2);
-shape.lineTo( 0, 0 );
-let blues = buildBlocks(shape, blueMaterial, 0);
+let blueShape = new THREE.Shape();
+blueShape.moveTo( 0,0 );
+blueShape.lineTo( RAD2, 0);
+blueShape.lineTo( RAD2 / 2, RAD2 / 2);
+blueShape.lineTo( 0, 0 );
+let blues = buildBlocks(blueShape, blueMaterial, 0);
 
 // Second, add the upper 'red' set of triangular blocks
 let redMaterial = new THREE.MeshPhongMaterial( { color: 0xFF0000,
     emissive: 0x072534, side: THREE.DoubleSide, flatShading: true } );
 
-shape = new THREE.Shape();
-shape.moveTo( 0, RAD2 / 2 );
-shape.lineTo( RAD2, RAD2 / 2);
-shape.lineTo( RAD2 / 2, 0);
-shape.lineTo( 0, RAD2 / 2 );
-let reds = buildBlocks(shape, redMaterial, RAD2 / 2);
+let redShape = new THREE.Shape();
+redShape.moveTo( 0, RAD2 / 2 );
+redShape.lineTo( RAD2, RAD2 / 2);
+redShape.lineTo( RAD2 / 2, 0);
+redShape.lineTo( 0, RAD2 / 2 );
+let reds = buildBlocks(redShape, redMaterial, RAD2 / 2);
 
 // Converts a string into a json object containing numbered angles
 function genAngles(s) {
@@ -151,8 +151,8 @@ function updateAngles() {
             delete currentAngles["angle" + i];
         }
     }
-    blues = buildBlocks(shape, blueMaterial, 0);
-    reds = buildBlocks(shape, redMaterial, RAD2 / 2);
+    blues = buildBlocks(blueShape, blueMaterial, 0);
+    reds = buildBlocks(redShape, redMaterial, RAD2 / 2);
     redrawSnake();
     buildGUI();
 }
@@ -196,7 +196,7 @@ function redrawSnake() {
         prevAngles[triCount] = currentAngles["angle" + triCount];
 
         function transformAfter(list, idx) {
-            for(; idx < 12; idx++) {
+            for(; idx < totalBlocks/2; idx++) {
                 let block = list[idx];
                 block.applyMatrix(invPivotMatrix);
                 block.position.sub(rotationPoint);
@@ -260,7 +260,7 @@ function buildGUI() {
         f1.add(controls, "autoRotate");
         f1.add(window, "clickToAnimate");
         f1.add(window, "playSound");
-        f1.add(configs, "totalBlocks", 2, 72).step(1).onChange(updateAngles).listen();
+        f1.add(configs, "totalBlocks", 12, 72).step(2).onChange(updateAngles).listen();
         function colorChange(material, newColor) {
             material.color.setRGB(newColor.r/256, newColor.g/256, newColor.b/256);
         }
