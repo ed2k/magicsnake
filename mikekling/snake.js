@@ -55,25 +55,35 @@ audioLoader.load( 'click.wav', function( buffer ) {
 
 playSound = true;
 
-// Build the Snake
-function buildBlocks(shape, material, offset) {
+function buildMesh(shape, material, offset) {
     let extrudeSettings = {
         steps: 2,
         depth: 1,
         bevelEnabled: false,
     };
-    let blocks = [];
 
     let geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     let mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(offset, 0, 0);
     scene.add(mesh);
+    return mesh;
+}
+
+function cloneMesh(mesh, idx, offset) {
+    let newMesh = mesh.clone();
+    newMesh.position.set(RAD2 * idx + offset, 0, 0);
+    scene.add(newMesh);
+    return newMesh;    
+}
+
+// Build the Snake
+function buildBlocks(shape, material, offset) {
+    let blocks = [];
+    let mesh = buildMesh(shape, material, offset);
     blocks.push(mesh);
 
-    for(let i = 1; i < configs.totalBlocks; i++) {
-        let newMesh = mesh.clone();
-        newMesh.position.set(RAD2 * i + offset, 0, 0);
-        scene.add(newMesh);
+    for(let i = 1; i < configs.totalBlocks/2; i++) {
+        let newMesh = cloneMesh(mesh, i, offset);
         blocks.push(newMesh);
     }
     return blocks;
@@ -142,13 +152,23 @@ function updateAngles() {
     angleBlocks = configs.totalBlocks - 1;
     if (delta > 0) {
         prevAngles = prevAngles.concat(Array(delta).fill(0));
-        for (let i = angleBlocks; i > (angleBlocks - delta); i-- ) {
+        for (let i = angleBlocks - delta + 1 ; i <= angleBlocks; i+=2 ) {
+            console.log(i);
             currentAngles["angle" + i] = 0;
+            currentAngles["angle" + (i + 1)] = 0;
+            blues.push(cloneMesh(blues[0], i/2, 0));
+            reds.push(cloneMesh(reds[0], i/2, RAD2 / 2));
         }
     } else {
         prevAngles = prevAngles.slice(0, configs.totalBlocks);
-        for (let i = angleBlocks; i > (angleBlocks - delta); i-- ) {
+        for (let i = angleBlocks; i > (angleBlocks - delta); i-=2 ) {
+            console.log(i);
             delete currentAngles["angle" + i];
+            delete currentAngles["angle" + (i - 1)];
+            scene.remove(blues[i/2]);
+            blues.splice(i/2, 1);
+            scene.remove(reds[i/2]);
+            reds.splice(i/2, 1);
         }
     }
     blues = buildBlocks(blueShape, blueMaterial, 0);
